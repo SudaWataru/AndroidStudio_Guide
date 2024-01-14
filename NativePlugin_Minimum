@@ -1,0 +1,42 @@
+package com.example;
+
+//ネイティブプラグインの最小構成
+public class MyPlugin {
+
+    //Static:CallStatic
+    public static String func_1(int n)
+    {
+        return( "Hello world!!" + Integer.toString(n) );
+    }
+
+    //Static:GetStatic,SetStatic
+    public static String mStr_1 = "aaaaa";
+
+    //Non Static:Call
+    String mStr_2;
+    MyPlugin(String str)
+    {
+        mStr_2 = str;
+    }
+    public String func_2(int n)
+    {
+        return( mStr_2 + Integer.toString(n) );
+    }
+
+    //Singleton
+    private static MyPlugin singleton = new MyPlugin();
+    private MyPlugin(){};
+
+    public static MyPlugin getInstance()
+    {
+        if(singleton == null)
+        {
+            singleton = new MyPlugin();
+        }
+        return singleton;
+    }
+
+    public String func_3(int n) {
+        return "Hello,World"+Integer.toString(n);
+    }
+}
