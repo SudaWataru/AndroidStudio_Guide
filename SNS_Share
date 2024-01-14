@@ -1,0 +1,55 @@
+package com.example;
+
+import static android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION;
+import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+
+import com.unity3d.player.UnityPlayer;
+
+//テキストのみをSNSでシェアする関数
+public class SNS_Share
+{
+    //* シェアウィンドウで特定のパッケージのみを開く
+     //* 除外の必要がなければstartChooserを使えば良い
+     //* @param title シェア画面の説明メッセージ
+     //* @param message 投稿メッセージ
+     //* @param type コンテンツタイプ
+     //* @param filePath 投稿するファイルのパス
+     //* @param ignorePackage 除外するActivity名、複数判定は良しなに実装
+
+    public void Share(String message)
+    {
+        String text = "";
+
+        Activity currentActivity = UnityPlayer.currentActivity;
+        Context context = currentActivity.getApplicationContext();
+
+        Log.d("SNSShare","context");
+
+        String title = "Let's Share NowPlayingMusic";
+
+        Log.d("SNSShare","title");
+
+        Intent targetIntent = new Intent(Intent.ACTION_SEND);
+        Log.d("SNSShare","targetIntent");
+
+        targetIntent.setFlags(FLAG_GRANT_READ_URI_PERMISSION);
+        targetIntent.setFlags(FLAG_GRANT_WRITE_URI_PERMISSION);
+
+        // コンテンツのType
+        targetIntent.setType("*/*");
+        Log.d("SNSShare","tartgetIntent.setType(*/*)");
+
+        // 投稿するメッセージ
+        targetIntent.putExtra(Intent.EXTRA_TEXT, message);
+        Log.d("SNSShare","putmessage");
+
+        Intent chooser = Intent.createChooser(targetIntent, title);
+        currentActivity.startActivity(chooser);
+
+    }
+}
