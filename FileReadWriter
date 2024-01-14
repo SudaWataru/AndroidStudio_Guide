@@ -1,0 +1,234 @@
+package com.example;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Environment;
+import android.util.Log;
+
+import com.unity3d.player.UnityPlayer;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
+//Fileの読み書きを行う
+public class ReadWriter extends Activity {
+
+    //ファイルから1文だけ読みとる関数
+    protected static String readText(String filename) {
+        String text = "";
+        String text_next = "";
+        String fileName = filename;
+        Context context = UnityPlayer.currentActivity.getApplicationContext();
+
+        //外部ストレージという名の内部ストレージにあるドキュメントディレクトリにアクセス
+        String filepath = String.valueOf(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS));
+
+        File readfile = new File(filepath + "/" + fileName);
+
+        String state = Environment.getExternalStorageState();
+
+        //Environment.MEDIA_MOUNTEDで読み書き処理を可能にする
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            //ファイルの読み書きの処理
+            try {
+                FileInputStream fis = new FileInputStream(readfile);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+                while ((text_next = reader.readLine()) != null) {
+                    text = text_next + "\n";
+                }
+            } catch (FileNotFoundException e) {
+                text = e.getMessage();
+                e.printStackTrace();
+
+            } catch (IOException e) {
+                text = e.getMessage();
+                e.printStackTrace();
+            }
+        }
+        return text;
+    }
+
+    //ファイル内のテキストデータをループで結合して呼び出す関数_ファイル内のテキストを全て取得できる
+    protected static String readTextAll(String filename) {
+        String text = "";
+        String text_next = "";
+        String fileName = filename;
+        Context context = UnityPlayer.currentActivity.getApplicationContext();
+        String filepath = String.valueOf(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS));
+
+        File readfile = new File(filepath + "/" + fileName);
+
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            //ファイルの読み書きの処理
+            try {
+                FileInputStream fis = new FileInputStream(readfile);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+
+                //テキストデータ1行分＋改行でループさせてデータ結合
+                while ((text_next = reader.readLine()) != null) {
+                    text += text_next + "\n";
+                }
+            } catch (FileNotFoundException e) {
+                text = e.getMessage();
+                e.printStackTrace();
+
+            } catch (IOException e) {
+                text = e.getMessage();
+                e.printStackTrace();
+            }
+        }
+
+        Log.d("AlarmManager", text);
+        return text;
+    }
+
+    //ファイルパス取得_今回は取得するファイル名を指定している
+    protected static String getFilePath() {
+        String fileName = "WalkCountLog.txt";
+        String filepath_str;
+        File filePath;
+        String filebool = "";
+
+        //参照するファイルパスの作成
+        filepath_str = UnityPlayer.currentActivity.getFilesDir().getPath() + "/" + fileName; //文字列
+        filePath = new File(filepath_str); //実際に参照するようのファイルを行う関数
+
+        //参照したパスおよびファイルがあればtrueを返す
+        if (filePath.exists() == true) {
+            filebool = "true";
+            Log.d("AlarmManager", filepath_str);
+        } else if (filePath.exists() == false) {
+            filebool = "false";
+        }
+
+        return filebool;
+    }
+
+    //外部ストレージ(携帯内で表示可能なストレージ)のファイルパスを取得
+    //携帯内で表示可能なストレージの例：DocumentsやDownload、DCIMという名前のフォルダのこと
+    protected static String getExtFilePath() {
+        String fileName = "WalkCountLog.txt";
+        String filepath_str;
+        File filePath;
+        String filebool = "";
+
+        Context context = UnityPlayer.currentActivity.getApplicationContext();
+        filepath_str = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/" + fileName; //Environment.DIRECTORY_DOCUMENTS=Documentフォルダ
+        filePath = new File(filepath_str);
+
+        if (filePath.exists() == true) {
+            filebool = "true";
+            Log.d("AlarmManager", filepath_str);
+        } else if (filePath.exists() == false) {
+            filebool = "false";
+        }
+        return filebool;
+    }
+
+  
+    //1フォルダ内のファイルリストを取得する関数
+    public static String getFileList() {
+        String file_bool = "false";
+        String filepath_str;
+        File file;
+        Context context = UnityPlayer.currentActivity.getApplicationContext();
+
+        filepath_str = String.valueOf(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS));
+        file = new File(filepath_str);
+        File fileArray[] = file.listFiles(); //.listFiles()でフォルダ内のファイルを配列に格納
+
+        if (file.exists() == true) {
+            Log.d("AlarmManager", String.valueOf(filepath_str));
+        } else if (file.exists() == false) {
+            Log.d("AlarmManager", "NoPath");
+        }
+
+        if (fileArray != null) {
+            Log.d("AlarmManager", "FileDirExist");
+        } else if (fileArray == null) {
+            Log.d("AlarmManager", "NoFileDir");
+        }
+
+        Log.d("AlarmManager", Integer.toString(fileArray.length));
+
+        // ファイルの一覧
+        if (fileArray.length == 0) {
+            file_bool = "true";
+            Log.d("AlarmManager", "file_bool_" + file_bool);
+        }
+
+        //.getNameでファイル名を取得していく
+        else if (fileArray.length > 0) {
+            for (int i = 0; i < fileArray.length; i++) {
+                Log.d("AlarmManager", fileArray[i].getName());//ファイル,フォルダを表示
+                if (fileArray[i].getName() == "WalkCountLog.txt") {
+                    file_bool = "true";
+                    Log.d("AlarmManager", "file_bool_" + file_bool);
+                }
+            }
+        }
+
+        return file_bool;
+    }
+
+    //ファイルを作成する関数
+    public static void createFile(String fileName) throws IOException {
+        File file;
+        Context context = UnityPlayer.currentActivity.getApplicationContext();
+        String filepath = String.valueOf(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS));
+        //String fileName = "WalkCountLog.txt";
+
+        file = new File(filepath + "/" + fileName);
+
+        //createNewFileメソッドを使用してファイルを作成する
+        if (file.createNewFile()) {
+            Log.d("AlarmManager", "create_file_Success");
+        } else {
+            Log.d("AlarmManager", "create_file_Fail");//ファイル,フォルダを表示
+        }
+    }
+
+    //ファイルにテキストデータを書き込む関数
+    public void writeSettingValue(String text) {
+
+        Log.d("AlarmManager", "firstSetting");
+
+        Activity activity = UnityPlayer.currentActivity;
+        Context context = activity.getApplicationContext();
+        String filepath = String.valueOf(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS));
+        String fileName = "SettingValue.txt";
+        File file;
+        File writefile = new File(filepath + "/" + fileName);
+        String state = Environment.getExternalStorageState();
+
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            try {
+                FileOutputStream fos = new FileOutputStream(writefile); //ファイル出力ストリーム作成
+                OutputStreamWriter writer = new OutputStreamWriter(fos, "UTF-8"); //書き込みストリーム作成
+                PrintWriter pw = new PrintWriter(writer); //書き込みモード使用
+                pw.println(text); //書き込み
+                pw.close(); //書き込みモード終了
+                writer.close(); //書き込みストリーム終了
+                fos.close(); //ファイル出力ストリーム終了
+
+            } catch (FileNotFoundException e) {
+                text = e.getMessage();
+                e.printStackTrace();
+
+            } catch (IOException e) {
+                text = e.getMessage();
+                e.printStackTrace();
+            }
+            Log.d("AlarmManager", text);
+        }
+    }
+}
