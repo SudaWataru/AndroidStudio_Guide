@@ -1,0 +1,36 @@
+package com.example;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Environment;
+import android.util.Log;
+
+import com.unity3d.player.UnityPlayer;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
+public class ReadWriter extends Activity 
+{
+    //サービスクラスを開始するための関数、今回は一定時間ごとにファイルに歩数を記録するサービスクラスの呼び出し
+    public void repeatWriteLog() {
+        Log.d("AlarmManager", "StartAlarmManager");
+
+        Activity activity = UnityPlayer.currentActivity;
+        Context context = activity.getApplicationContext();
+        Intent intent = new Intent(context, StepCounterService.class); //Intent作成
+        intent.putExtra("REQUEST_CODE", 1001); //Intentを判別する用のREQUEST_CODEを付与
+        Log.d("AlarmManager", "Init_rw");
+
+        context.startForegroundService(intent); //作成したIntentを使用してフォアグラウンド(今表示されている画面)でサービス開始
+        Log.d("AlarmManager", "Worker scheduled_rw");
+    }
+}
